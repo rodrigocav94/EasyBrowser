@@ -34,6 +34,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
             progressView.progress = Float(webView.estimatedProgress)
+            progressView.isHidden = webView.estimatedProgress >= 1.0
         }
         // it's telling us which key path was changed, and it also sends us back the context we registered earlier so you can check whether this callback is for you or not.
     }
@@ -45,8 +46,15 @@ class ViewController: UIViewController, WKNavigationDelegate {
         
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
+        
+        let back = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: .plain, target: webView, action: #selector(webView.goBack))
+        let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+        fixedSpace.width = 8
+        
+        let forward = UIBarButtonItem(image: UIImage(systemName: "chevron.right"), style: .plain, target: webView, action: #selector(webView.goForward))
 
-        toolbarItems = [progressButton, spacer, refresh]
+
+        toolbarItems = [back, fixedSpace, forward, progressButton, spacer, refresh]
         navigationController?.isToolbarHidden = false
     }
 
@@ -81,6 +89,11 @@ class ViewController: UIViewController, WKNavigationDelegate {
                     return
                 }
             }
+        
+            let ac = UIAlertController(title: title, message: "This website is blocked.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            
+            present(ac, animated: true)
         }
 
         decisionHandler(.cancel)
