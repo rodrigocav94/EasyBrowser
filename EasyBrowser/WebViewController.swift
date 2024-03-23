@@ -8,10 +8,11 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController, WKNavigationDelegate {
+class WebViewController: UIViewController, WKNavigationDelegate {
     var webView: WKWebView!
     var progressView: UIProgressView!
-    var websites = ["apple.com", "google.com"]
+    var selectedWebsite: String?
+    var websites = [String]()
     
     override func loadView() {
         webView = WKWebView()
@@ -21,10 +22,11 @@ class ViewController: UIViewController, WKNavigationDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let url = URL(string: "https://" + websites[0])!
+        let url = URL(string: "https://" + (selectedWebsite ?? websites[0]))!
         webView.load(URLRequest(url: url))
         webView.allowsBackForwardNavigationGestures = true
         
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Open", style: .plain, target: self, action: #selector(openTapped))
         setupToolbar()
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
